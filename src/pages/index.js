@@ -4,13 +4,13 @@ import PostPreview from "../components/post-preview";
 
 const IndexPage = ({ data }) => {
   return (
-    <main>
+    <>
       {data.posts.nodes.length && data.posts.nodes.map((post, key) => {
         return (
             <PostPreview key={key} post={post}></PostPreview>
         );
       })}
-    </main>
+    </>
   )
 }
 
