@@ -3,7 +3,10 @@ export function routePath(content) {
     switch(content.internal.type) {
       case "ContentfulPost":
         return `posts/${content.slug}`;
-        break;
+      default:
+        return null;
     }
   }
+
+  return null;
 }

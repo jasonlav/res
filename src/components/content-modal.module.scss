@@ -1,0 +1,26 @@
+.content {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 510;
+  overflow: auto;
+}
+
+.window {
+  background-color: #FFF;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+.tint {
+  position: fixed;
+  z-index: 501;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
