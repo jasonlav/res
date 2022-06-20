@@ -3,7 +3,7 @@ import * as styles from "./content-modal.module.scss";
 
 function ContentModal({ children }) {
   return (
-      <div className={styles.modal}>
+      <div>
         <div className={styles.content}>
           <div className={styles.window}>
             {children}

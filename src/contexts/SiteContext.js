@@ -8,7 +8,7 @@ export function useSite() {
 }
 
 export function initialState() {
-  const localState = (window) ? window.localStorage.getItem('state') : false;
+  const localState = (typeof window !== 'undefined') ? window.localStorage.getItem('state') : false;
 
   if(localState) {
     return JSON.parse(localState);
@@ -23,7 +23,7 @@ export function SiteProvider({ children }) {
   function setState(newState) {
     const state = {...contextState, ...newState};
 
-    if(window) {
+    if(typeof window !== 'undefined') {
       window.localStorage.setItem('state', JSON.stringify(state));
     }
 
