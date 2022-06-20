@@ -7,13 +7,16 @@ import { useLocation } from '@reach/router';
 import ContentModal from "./content-modal";
 import { useScrollYPosition } from "react-use-scroll-position";
 import "../site.scss";
+import { useSite } from "../contexts/SiteContext";
 
 function Layout({ children }) {
   const location = useLocation();
   const [modal, setModal] = useState(false);
   const [pageY, setPageY] = useState(0);
+  const [lastPath, setLastPath] = useState(0);
   const scrollY = useScrollYPosition();
   const feedElement = useRef();
+  const { setState } = useSite();
 
   const { posts } = useStaticQuery(graphql`
     query {
@@ -30,6 +33,11 @@ function Layout({ children }) {
   `);
 
   useEffect(() => {
+    if(lastPath) {
+      setState({ visited: 1 });
+    }
+    setLastPath(location.pathname);
+
     if(location.pathname === '/') {
       setModal(false);
       document.documentElement.setAttribute('data-scroll', true);
@@ -42,16 +50,16 @@ function Layout({ children }) {
   }, [location]);
 
   return (
-      <div id="site">
-        <Header></Header>
-        <main>
-          {modal && (<ContentModal>{ children }</ContentModal>)}
-          <div style={{transform: modal ? `translate(0, ${-pageY}px)` : ''}}>
-            <Feed posts={posts}></Feed>
-          </div>
-        </main>
-        <Footer></Footer>
-      </div>
+    <div id="site">
+      <Header></Header>
+      <main>
+        {modal && (<ContentModal>{ children }</ContentModal>)}
+        <div style={{transform: modal ? `translate(0, ${-pageY}px)` : ''}}>
+          <Feed posts={posts}></Feed>
+        </div>
+      </main>
+      <Footer></Footer>
+    </div>
   )
 }
 
