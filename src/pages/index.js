@@ -1,13 +1,14 @@
 import * as React from "react"
 import { graphql } from "gatsby"
+import PostPreview from "../components/post-preview";
 
 const IndexPage = ({ data }) => {
-  console.log(data);
   return (
     <main>
-      Hello world!
       {data.posts.nodes.length && data.posts.nodes.map((post, key) => {
-        return (<section key={key}>{post.title}</section>);
+        return (
+            <PostPreview key={key} post={post}></PostPreview>
+        );
       })}
     </main>
   )
