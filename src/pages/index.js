@@ -19,6 +19,10 @@ export const query = graphql`
     posts: allContentfulPost {
       nodes {
         title
+        slug
+        internal {
+          type
+        }
       }
     }
   }
