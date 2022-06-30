@@ -1,5 +1,8 @@
 import React from "react";
 import {graphql, Link} from "gatsby";
+import { renderRichText } from 'gatsby-source-contentful/rich-text';
+import { INLINES, BLOCKS } from '@contentful/rich-text-types';
+import Powerword from "../../components/powerword";
 
 function Post({ data }) {
   const { post } = data;
@@ -9,12 +12,51 @@ function Post({ data }) {
         <Link to="/">Home</Link>
         <article>
           <h1>{ post.title }</h1>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Donec ullamcorper nulla non metus auctor fringilla. Sed posuere consectetur est at lobortis. Sed posuere consectetur est at lobortis. Etiam porta sem malesuada magna mollis euismod.</p>
-          <p>Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Curabitur blandit tempus porttitor. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Cras justo odio, dapibus ac facilisis in, egestas eget quam.</p>
-          <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</p>
-          <p>Cras mattis consectetur purus sit amet fermentum. Vestibulum id ligula porta felis euismod semper. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Vestibulum id ligula porta felis euismod semper. Donec ullamcorper nulla non metus auctor fringilla. Aenean lacinia bibendum nulla sed consectetur. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Donec sed odio dui. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-          <p>Nulla vitae elit libero, a pharetra augue. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec sed odio dui. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+          <div>{renderRichText(post.body, {
+            renderNode: {
+              [BLOCKS.PARAGRAPH]: (node, children) => {
+                children = children.map((child, i) => {
+                  const content = node.content[i];
+                  const nextContent = node.content[i+1];
+
+                  if (
+                      content.nodeType === 'embedded-entry-inline' &&
+                      content.data.target.__typename === "ContentfulPowerword" &&
+                      nextContent &&
+                      nextContent.nodeType === 'text'
+                  ) {
+                    const nextChild = children[i+1];
+                    const powerword = content.data.target.title;
+                    const pos = nextChild.toLowerCase().search(new RegExp(powerword, "i"));
+
+                    if (pos >= 0) {
+                      content.data.target.__placeholder = nextChild.substring(pos, powerword.length);
+                      children[i+1] = nextChild.substring(0, pos) + nextChild.substring(pos + powerword.length);
+                      return <Powerword word={content.data.target} key={i}></Powerword>
+                    }
+                  }
+
+                  return child;
+                });
+
+                return React.createElement(
+                  "p",
+              null,
+                  children
+                )
+              },
+              [INLINES.EMBEDDED_ENTRY]: (node, children) => {
+                if (
+                    node.nodeType === "embedded-entry-inline" &&
+                    node.data.target.__typename === "ContentfulPowerword"
+                ) {
+                  return null;
+                }
+
+                return children;
+              }
+            }
+          })}</div>
         </article>
       </>
   )
@@ -26,6 +68,17 @@ export const query = graphql`
       id
       title
       slug
+      body {
+        raw
+        references {
+          ... on ContentfulPowerword {
+            contentful_id
+            title
+            description
+            __typename
+          }
+        }
+      }
     }
   }
 `;

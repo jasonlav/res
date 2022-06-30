@@ -1,0 +1,30 @@
+.root {
+  display: inline-block;
+  position: relative;
+
+  &:hover .tip {
+    display: block;
+  }
+}
+
+.placeholder {
+  font-weight: bold;
+}
+
+.tip {
+  display: none;
+  bottom: 0;
+  background-color: #efefef;
+  position: absolute;
+  transform: translate(0, 100%);
+}
+
+.title {
+  display: block;
+}
+
+.description {
+  margin-top: 0.5em;
+  display: block;
+  font-size: 0.75rem;
+}
